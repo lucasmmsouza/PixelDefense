@@ -16,9 +16,9 @@ export class Game {
     this.ui = new UIManager(this);
     this.waveManager = new WaveManager(this);
 
-    this.entities = []; // Inimigos, Projéteis, Soldados
+    this.entities = [];
     this.towers = [];
-    this.enemies = []; // Referência rápida para performance
+    this.enemies = [];
 
     this.state = {
       gold: 200,
@@ -37,7 +37,7 @@ export class Game {
     this.levelData = LEVELS[this.state.levelIndex];
 
     if(!this.levelData) {
-      alert("Fim de Jogo! Parabéns."); // Placeholder
+      alert("Você venceu o jogo!");
       return;
     }
 
@@ -85,9 +85,15 @@ export class Game {
 
     [...this.towers, ...this.entities].forEach(e => e.update(dt, this));
 
-    // Limpeza
+    // Limpeza de entidades mortas
     this.entities = this.entities.filter(e => !e.markedForDeletion);
     this.enemies = this.entities.filter(e => e.renderType === 'ENEMY');
+
+    // === CORREÇÃO: Verificação de Vitória ===
+    // Se não há mais ondas para vir E não há inimigos vivos
+    if (this.waveManager.isLevelComplete() && this.enemies.length === 0) {
+      this.checkVictoryCondition();
+    }
 
     // Game Over
     if (this.state.lives <= 0) {
@@ -103,16 +109,17 @@ export class Game {
     this.renderer.drawSelection(this.selectedEntity);
   }
 
-  // === Lógica de Jogo Exposta ===
-
   spawnEnemy(config) {
     const enemy = new Enemy(config, this.levelData.path);
-    this.entities.push(enemy);
-    this.enemies.push(enemy);
+    this.addEntity(enemy);
   }
 
   addEntity(entity) {
     this.entities.push(entity);
+    if (entity.renderType === 'ENEMY') {
+      // Pequeno hack para manter a lista de enemies atualizada rapidamente
+      // (embora o update() vá corrigir isso no próximo frame)
+    }
   }
 
   addGold(amount) {
@@ -126,10 +133,8 @@ export class Game {
   }
 
   checkVictoryCondition() {
-    if (this.enemies.length === 0 && !this.waveManager.activeWave) {
-      this.state.isPaused = true;
-      this.ui.showScreen('victory-screen');
-    }
+    this.state.isPaused = true;
+    this.ui.showScreen('victory-screen');
   }
 
   togglePause() {
@@ -140,10 +145,7 @@ export class Game {
     }
   }
 
-  // === Inputs ===
-
   handleInput(x, y, screenX, screenY) {
-    // 1. Clicou em Entidade/Torre?
     const clickedEntity = [...this.towers, ...this.enemies].find(e => {
       const r = e.renderType === 'ENEMY' ? 20 : 15;
       return getDistance(x, y, e.x, e.y) < r;
@@ -156,7 +158,6 @@ export class Game {
       return;
     }
 
-    // 2. Lógica de Quartel (Rally Point)
     if (this.selectedEntity && this.selectedEntity.renderType === 'TOWER' && this.selectedEntity.stats.type === 'barracks') {
       if (getDistance(x, y, this.selectedEntity.x, this.selectedEntity.y) < this.selectedEntity.stats.range) {
         this.selectedEntity.setRallyPoint(x, y);
@@ -167,9 +168,7 @@ export class Game {
     this.selectedEntity = null;
     this.ui.hideEntityInfo();
 
-    // 3. Clicou em Spot Vazio?
     const clickedSpot = this.levelData.spots.find(s => {
-      // Verifica se já tem torre
       const occupied = this.towers.some(t => getDistance(t.x, t.y, s.x, s.y) < 5);
       return !occupied && getDistance(x, y, s.x, s.y) < 20;
     });
@@ -190,8 +189,6 @@ export class Game {
       const tower = new Tower(stats, this.selectedSpot.x, this.selectedSpot.y, this.levelData.path);
       this.towers.push(tower);
       this.ui.hideBuildMenu();
-
-      // Seleciona a torre criada
       this.selectedEntity = tower;
       this.ui.showEntityInfo(tower);
     }

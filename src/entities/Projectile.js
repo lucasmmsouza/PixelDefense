@@ -13,7 +13,6 @@ export class Projectile extends Entity {
   update(dt, gameState) {
     if (this.markedForDeletion) return;
 
-    // Se o alvo morreu e não é área, projétil some
     if (this.stats.type !== 'area' && (this.target.markedForDeletion || this.target.hp <= 0)) {
       this.markedForDeletion = true;
       return;
@@ -21,14 +20,15 @@ export class Projectile extends Entity {
 
     const dist = getDistance(this.x, this.y, this.target.x, this.target.y);
 
-    if (dist < this.speed) {
+    const moveStep = this.speed * (dt / 16);
+
+    if (dist < moveStep) {
       this.hit(gameState);
     } else {
       const dx = this.target.x - this.x;
       const dy = this.target.y - this.y;
-      // Normalizando movimento
-      this.x += (dx / dist) * this.speed; // (speed aqui está assumindo frame fixo, ideal multiplicar por dt)
-      this.y += (dy / dist) * this.speed;
+      this.x += (dx / dist) * moveStep;
+      this.y += (dy / dist) * moveStep;
     }
   }
 

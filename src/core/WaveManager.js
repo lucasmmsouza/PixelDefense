@@ -16,9 +16,9 @@ export class WaveManager {
   }
 
   loadLevel(levelData) {
+    this.reset(); // Reset primeiro
     this.wavesData = levelData.waves;
-    this.reset();
-    this.autoStartTimer = 5000; // Tempo antes da primeira onda
+    this.autoStartTimer = 5000;
   }
 
   update(dt) {
@@ -28,21 +28,18 @@ export class WaveManager {
         if (this.waveQueue.length > 0) {
           const enemyKey = this.waveQueue.shift();
           this.game.spawnEnemy(ENEMY_TYPES[enemyKey]);
-          this.spawnTimer = 1000; // Delay entre inimigos
+          this.spawnTimer = 1000;
         } else {
           this.activeWave = false;
           this.waveIndex++;
 
           if (this.waveIndex < this.wavesData.length) {
-            this.autoStartTimer = 15000; // Tempo entre ondas
-          } else {
-            // Fim das ondas
-            this.game.checkVictoryCondition();
+            this.autoStartTimer = 15000;
           }
+          // A verificação de vitória foi movida para o Game.js
         }
       }
     } else {
-      // Contagem regressiva
       if (this.autoStartTimer > 0 && this.waveIndex < this.wavesData.length) {
         this.autoStartTimer -= dt;
         if (this.autoStartTimer <= 0) {
@@ -55,7 +52,6 @@ export class WaveManager {
   startNextWave() {
     if (this.activeWave || this.waveIndex >= this.wavesData.length) return;
 
-    // Bonus de ouro se adiantar onda
     if (this.autoStartTimer > 0) {
       this.game.addGold(Math.floor(this.autoStartTimer / 1000) * 2);
     }
@@ -64,5 +60,10 @@ export class WaveManager {
     this.activeWave = true;
     this.spawnTimer = 0;
     this.autoStartTimer = 0;
+  }
+
+  // Novo método auxiliar
+  isLevelComplete() {
+    return !this.activeWave && this.waveIndex >= this.wavesData.length;
   }
 }
