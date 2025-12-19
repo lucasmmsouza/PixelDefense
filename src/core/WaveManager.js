@@ -16,9 +16,10 @@ export class WaveManager {
   }
 
   loadLevel(levelData) {
-    this.reset(); // Reset primeiro
+    this.reset();
     this.wavesData = levelData.waves;
-    this.autoStartTimer = 5000;
+    // CORREÇÃO: Timer zerado para não iniciar sozinho. Requer ação do jogador.
+    this.autoStartTimer = 0;
   }
 
   update(dt) {
@@ -36,7 +37,6 @@ export class WaveManager {
           if (this.waveIndex < this.wavesData.length) {
             this.autoStartTimer = 15000;
           }
-          // A verificação de vitória foi movida para o Game.js
         }
       }
     } else {
@@ -62,7 +62,6 @@ export class WaveManager {
     this.autoStartTimer = 0;
   }
 
-  // Novo método auxiliar
   isLevelComplete() {
     return !this.activeWave && this.waveIndex >= this.wavesData.length;
   }

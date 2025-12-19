@@ -1,6 +1,5 @@
 // Mapas de Sprites (0 = transparente, outras letras = cores)
 const SPRITES_MAP = {
-  // Arqueiro: Capuz marrom, rosto pele, arco madeira
   ARCHER: [
     "   ooo  ",
     "  ooooo ",
@@ -10,7 +9,6 @@ const SPRITES_MAP = {
     "  bbbbb ",
     "  b b b "
   ],
-  // Mago: Chapéu roxo, barba branca
   MAGE: [
     "   pp   ",
     "  pppp  ",
@@ -20,7 +18,6 @@ const SPRITES_MAP = {
     "  mmm   ",
     "  m m   "
   ],
-  // Canhão: Preto e cinza, rodas
   BOMB: [
     "        ",
     "   kk   ",
@@ -30,7 +27,6 @@ const SPRITES_MAP = {
     " s s s  ",
     "s s s s "
   ],
-  // Quartel: Telhado vermelho, paredes pedra
   BARRACKS: [
     "   rr   ",
     "  rrrr  ",
@@ -40,7 +36,6 @@ const SPRITES_MAP = {
     " c cc c ",
     " cccccc "
   ],
-  // Orc: Pele verde, olhos vermelhos
   NORMAL: [
     "  gggg  ",
     " gggggg ",
@@ -49,7 +44,6 @@ const SPRITES_MAP = {
     "  gggg  ",
     "  g  g  "
   ],
-  // Lobo: Amarelo/Laranja, rápido
   FAST: [
     "        ",
     "   yy   ",
@@ -58,7 +52,6 @@ const SPRITES_MAP = {
     " y y y  ",
     " y y y  "
   ],
-  // Ogro: Grande, vermelho
   TANK: [
     "  rrrr  ",
     " rrrrrr ",
@@ -75,21 +68,20 @@ const SPRITES_MAP = {
   ]
 };
 
-// Paleta de Cores para os caracteres
 const PALETTE = {
-  'o': '#d35400', // Marrom Arqueiro
-  'f': '#ffccaa', // Pele
-  'b': '#8d6e63', // Roupa Arqueiro
-  'p': '#8e44ad', // Roxo Mago
-  'w': '#ffffff', // Barba
-  'm': '#5e35b1', // Manto Mago
-  'k': '#2c3e50', // Metal Canhão
-  's': '#95a5a6', // Rodas
-  'r': '#c0392b', // Vermelho (Telhado/Ogro)
-  'c': '#7f8c8d', // Pedra
-  'g': '#27ae60', // Verde Orc
-  'y': '#f1c40f', // Amarelo Lobo
-  'a': '#3498db', // Azul Soldado
+  'o': '#d35400',
+  'f': '#ffccaa',
+  'b': '#8d6e63',
+  'p': '#8e44ad',
+  'w': '#ffffff',
+  'm': '#5e35b1',
+  'k': '#2c3e50',
+  's': '#95a5a6',
+  'r': '#c0392b',
+  'c': '#7f8c8d',
+  'g': '#27ae60',
+  'y': '#f1c40f',
+  'a': '#3498db',
 };
 
 export class Renderer {
@@ -99,7 +91,6 @@ export class Renderer {
     this.width = canvas.width;
     this.height = canvas.height;
 
-    // Cache de sprites gerados
     this.spriteCache = {};
     this.generateAllSprites();
   }
@@ -111,7 +102,7 @@ export class Renderer {
   }
 
   createSpriteFromMap(map) {
-    const size = 4; // Tamanho de cada "pixel" do sprite
+    const size = 4;
     const rows = map.length;
     const cols = map[0].length;
 
@@ -141,25 +132,21 @@ export class Renderer {
     const ctx = this.ctx;
     if (!levelData) return;
 
-    // Desenha Estrada
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    // Borda
     ctx.beginPath();
     ctx.strokeStyle = '#6d4c41';
     ctx.lineWidth = 44;
     this.tracePath(ctx, levelData.path);
     ctx.stroke();
 
-    // Centro
     ctx.beginPath();
     ctx.strokeStyle = '#e6c589';
     ctx.lineWidth = 36;
     this.tracePath(ctx, levelData.path);
     ctx.stroke();
 
-    // Spots
     for (let spot of levelData.spots) {
       ctx.fillStyle = 'rgba(0,0,0,0.15)';
       ctx.beginPath();
@@ -185,13 +172,11 @@ export class Renderer {
 
       this.ctx.save();
 
-      // Sombra
       this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
       this.ctx.beginPath();
       this.ctx.ellipse(e.x, e.y + 2, 10, 5, 0, 0, Math.PI*2);
       this.ctx.fill();
 
-      // Sprite
       let spriteKey = '';
       if (e.renderType === 'TOWER') spriteKey = e.stats.id;
       else if (e.renderType === 'ENEMY') spriteKey = e.stats.id;
@@ -199,15 +184,12 @@ export class Renderer {
 
       const img = this.spriteCache[spriteKey];
       if (img) {
-        // Desenha centralizado
         this.ctx.drawImage(img, e.x - img.width/2, e.y - img.height + 4);
       } else {
-        // Fallback
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(e.x-5, e.y-10, 10, 10);
       }
 
-      // Barra de vida (para inimigos e soldados)
       if (e.renderType === 'ENEMY' || e.renderType === 'SOLDIER') {
         this.drawHealthBar(e.x, e.y - 25, e.hp, e.maxHp, 20);
       }
@@ -239,30 +221,27 @@ export class Renderer {
 
     let r = entity.renderType === 'ENEMY' ? 25 : entity.stats.range;
 
+    // CORREÇÃO: Reseta a largura da linha
+    this.ctx.lineWidth = 2;
+
     this.ctx.beginPath();
     this.ctx.arc(entity.x, entity.y, r, 0, Math.PI*2);
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     this.ctx.fill();
-    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-    this.ctx.setLineDash([4, 4]);
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    this.ctx.setLineDash([5, 5]);
     this.ctx.stroke();
 
-    // Linha de Rally do Quartel
     if (entity.renderType === 'TOWER' && entity.stats.type === 'barracks') {
       this.ctx.beginPath();
       this.ctx.moveTo(entity.x, entity.y);
       this.ctx.lineTo(entity.rallyPoint.x, entity.rallyPoint.y);
       this.ctx.strokeStyle = '#fff';
+      this.ctx.setLineDash([]); // Linha sólida para o rally
       this.ctx.stroke();
 
-      // Bandeira no destino
       this.ctx.fillStyle = '#f1c40f';
       this.ctx.fillRect(entity.rallyPoint.x - 2, entity.rallyPoint.y - 10, 4, 6);
-      this.ctx.beginPath();
-      this.ctx.moveTo(entity.rallyPoint.x, entity.rallyPoint.y - 4);
-      this.ctx.lineTo(entity.rallyPoint.x, entity.rallyPoint.y);
-      this.ctx.strokeStyle = 'white';
-      this.ctx.stroke();
     }
 
     this.ctx.restore();

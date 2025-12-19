@@ -30,9 +30,17 @@ export class Game {
     this.levelData = null;
     this.selectedSpot = null;
     this.selectedEntity = null;
+
+    this.animationFrameId = null;
   }
 
   startLevel(levelIndex) {
+    // Cancela o loop anterior se existir para evitar aceleração
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+
     this.state.levelIndex = levelIndex - 1;
     this.levelData = LEVELS[this.state.levelIndex];
 
@@ -48,7 +56,9 @@ export class Game {
 
     this.state.isPaused = false;
     this.lastTime = performance.now();
-    requestAnimationFrame((t) => this.loop(t));
+
+    // Inicia o novo loop
+    this.loop(performance.now());
   }
 
   resetGame() {
@@ -62,6 +72,7 @@ export class Game {
   }
 
   loop(timestamp) {
+    // Se estiver pausado, não solicita o próximo frame (ou controla apenas o tempo)
     if (this.state.isPaused) return;
 
     const dt = timestamp - this.lastTime;
@@ -70,7 +81,7 @@ export class Game {
     this.update(dt);
     this.draw();
 
-    requestAnimationFrame((t) => this.loop(t));
+    this.animationFrameId = requestAnimationFrame((t) => this.loop(t));
   }
 
   update(dt) {
@@ -89,8 +100,7 @@ export class Game {
     this.entities = this.entities.filter(e => !e.markedForDeletion);
     this.enemies = this.entities.filter(e => e.renderType === 'ENEMY');
 
-    // === CORREÇÃO: Verificação de Vitória ===
-    // Se não há mais ondas para vir E não há inimigos vivos
+    // Verificação de Vitória
     if (this.waveManager.isLevelComplete() && this.enemies.length === 0) {
       this.checkVictoryCondition();
     }
@@ -116,10 +126,6 @@ export class Game {
 
   addEntity(entity) {
     this.entities.push(entity);
-    if (entity.renderType === 'ENEMY') {
-      // Pequeno hack para manter a lista de enemies atualizada rapidamente
-      // (embora o update() vá corrigir isso no próximo frame)
-    }
   }
 
   addGold(amount) {
@@ -134,6 +140,7 @@ export class Game {
 
   checkVictoryCondition() {
     this.state.isPaused = true;
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     this.ui.showScreen('victory-screen');
   }
 
@@ -141,7 +148,9 @@ export class Game {
     this.state.isPaused = !this.state.isPaused;
     if (!this.state.isPaused) {
       this.lastTime = performance.now();
-      requestAnimationFrame((t) => this.loop(t));
+      this.loop(performance.now());
+    } else {
+      if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     }
   }
 

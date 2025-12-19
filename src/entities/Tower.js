@@ -9,13 +9,13 @@ export class Tower extends Entity {
     this.renderType = 'TOWER';
     this.stats = config;
     this.cooldown = 0;
-    this.levelPath = levelPath; // Necessário para quartéis
+    this.levelPath = levelPath;
 
     if (this.stats.type === 'barracks') {
       this.soldiers = [];
       this.spawnTimer = 0;
-      // Ponto inicial de rally é o ponto mais próximo no caminho
       this.rallyPoint = getClosestPointOnPath(this.x, this.y, levelPath);
+      this.initialized = false; // Flag para o spawn inicial
     }
   }
 
@@ -23,6 +23,15 @@ export class Tower extends Entity {
     this.cooldown -= dt;
 
     if (this.stats.type === 'barracks') {
+      // CORREÇÃO: Spawn inicial imediato dos 3 soldados
+      if (!this.initialized) {
+        for (let i = 0; i < 3; i++) {
+          const s = new Soldier(this.x, this.y, this);
+          this.soldiers.push(s);
+          gameState.addEntity(s);
+        }
+        this.initialized = true;
+      }
       this.handleBarracks(dt, gameState);
     } else {
       if (this.cooldown <= 0) {
@@ -42,7 +51,7 @@ export class Tower extends Entity {
     if (this.spawnTimer <= 0 && this.soldiers.length < 3) {
       const s = new Soldier(this.x, this.y, this);
       this.soldiers.push(s);
-      gameState.addEntity(s); // Adiciona à lista global
+      gameState.addEntity(s);
       this.spawnTimer = this.stats.respawnRate;
     }
   }
