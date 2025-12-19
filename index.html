@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pixel Kingdom Defense</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="game-wrapper">
+  <div id="game-container">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <div id="ui-layer">
+      <div class="top-bar">
+        <div class="stats-area">
+          <div class="hud-item" style="color: #e74c3c;">❤ <span id="lives-display">5</span></div>
+          <div class="hud-item" style="color: #f1c40f;">$ <span id="gold-display">200</span></div>
+          <div class="hud-item" style="color: #3498db;">Fase <span id="level-display">1</span></div>
+          <div class="hud-item" style="color: #ecf0f1;">Onda <span id="wave-display">0/0</span> <span id="timer-display"></span></div>
+        </div>
+        <div class="controls-area">
+          <button class="control-btn" id="btn-pause">⏸</button>
+          <button class="control-btn" id="btn-restart-map">↺</button>
+        </div>
+      </div>
+
+      <div id="info-panel" class="hidden">
+        <div id="info-title">Detalhes</div>
+        <div id="info-content">
+        </div>
+      </div>
+
+      <button id="start-wave-btn" class="hidden">Iniciar Batalha</button>
+    </div>
+
+    <div id="build-menu" class="hidden"></div>
+
+    <div id="pause-menu" class="hidden">
+      <h1 style="font-size: 24px; margin-bottom: 20px;">PAUSADO</h1>
+      <button class="game-btn" id="btn-resume">CONTINUAR</button>
+      <button class="game-btn secondary-btn" id="btn-menu-principal">MENU PRINCIPAL</button>
+    </div>
+
+    <div id="screens">
+      <div id="start-screen">
+        <h1>PIXEL DEFENSE</h1>
+        <p>Proteja o reino! Construa torres e pare os monstros.</p>
+        <button class="game-btn" id="btn-start-game">JOGAR</button>
+        <div class="credits">By Lucas Miguel</div>
+      </div>
+
+      <div id="game-over-screen" class="hidden">
+        <h1 style="color: #c0392b;">DERROTA</h1>
+        <button class="game-btn" id="btn-retry">TENTAR NOVAMENTE</button>
+      </div>
+
+      <div id="victory-screen" class="hidden">
+        <h1>VITÓRIA!</h1>
+        <button class="game-btn" id="btn-next-level">PRÓXIMA FASE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

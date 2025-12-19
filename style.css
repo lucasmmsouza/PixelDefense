@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+  background-color: #2c2c2c;
+  color: white;
+  font-family: 'Press Start 2P', cursive;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+#game-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 800/600;
+}
+
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  border: 4px solid #4a3b2a;
+  background: #000;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #5da130;
+}
+
+/* === UI LAYER === */
+#ui-layer {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; /* Permite clicar no jogo através da UI */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Barra Superior */
+.top-bar {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  pointer-events: auto; /* Permite clicar nos botões */
+}
+@media (min-width: 600px) { .top-bar { font-size: 14px; } }
+
+.stats-area { display: flex; gap: 15px; }
+.controls-area { display: flex; gap: 5px; }
+.hud-item { display: flex; align-items: center; gap: 5px; }
+
+.control-btn {
+  pointer-events: auto;
+  cursor: pointer;
+  background: #7f8c8d;
+  border: 2px solid #fff;
+  color: white;
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: 12px;
+}
+.control-btn:hover { background: #95a5a6; }
+
+/* === INFO PANEL (Restaurado) === */
+#info-panel {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #e6c589;
+  padding: 10px;
+  width: 160px;
+  pointer-events: none;
+  z-index: 150;
+  font-size: 10px;
+  color: #ecf0f1;
+  display: block; /* Controlado via classe .hidden */
+}
+
+#info-title {
+  color: #f1c40f;
+  border-bottom: 1px solid #555;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+/* === START WAVE BUTTON === */
+#start-wave-btn {
+  pointer-events: auto;
+  background: #d35400;
+  border: 2px solid #fff;
+  color: white;
+  padding: 15px 25px;
+  font-family: inherit;
+  font-size: 12px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+  z-index: 50;
+}
+#start-wave-btn:hover { background: #e67e22; }
+
+/* === BUILD MENU === */
+#build-menu {
+  position: absolute;
+  background: #e6c589;
+  border: 3px solid #5e412f;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  pointer-events: auto;
+  z-index: 100;
+  transform: translate(-50%, -50%);
+}
+
+.build-btn {
+  width: 50px; height: 50px;
+  border: 2px solid #5e412f;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #333;
+}
+.build-btn .icon { font-size: 20px; margin-bottom: 2px; }
+.build-btn .price { font-size: 8px; font-weight: bold; background: rgba(0,0,0,0.1); padding: 1px 3px; border-radius: 2px; }
+
+.build-btn:hover { filter: brightness(1.1); }
+.build-btn.disabled { filter: grayscale(1); opacity: 0.6; cursor: not-allowed; }
+
+/* Cores específicas */
+.btn-ARCHER { background-color: #a67c52; }
+.btn-MAGE { background-color: #8e44ad; }
+.btn-BOMB { background-color: #e74c3c; }
+.btn-BARRACKS { background-color: #95a5a6; }
+
+/* === PAUSE MENU & SCREENS === */
+#pause-menu {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  border: 4px solid #4a3b2a;
+  padding: 20px;
+  text-align: center;
+  z-index: 250;
+  min-width: 200px;
+}
+
+#screens {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  z-index: 200;
+  text-align: center;
+}
+#screens > div { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+
+.hidden { display: none !important; }
+
+.game-btn {
+  background: #27ae60; border: 4px solid #1e8449;
+  color: white; padding: 15px; font-family: inherit; cursor: pointer;
+}
+.secondary-btn { background: #7f8c8d; border-color: #95a5a6; }
